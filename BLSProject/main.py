@@ -1,8 +1,7 @@
 import requests
 import json
 import pandas as pd
-import matplotlib as mpl
-
+import matplotlib as plt
 
 BLS_API_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
@@ -20,6 +19,21 @@ inflation_data = {
 
 unemployment_response = requests.post(BLS_API_URL, json=unemployment_data, headers=headers)
 inflation_response = requests.post(BLS_API_URL, json=inflation_data, headers=headers)
-print(json.dumps(unemployment_response.json(), indent=4))
-print("#######################################################")
-print(json.dumps(inflation_response.json(), indent=4))
+
+unemployment_response = unemployment_response.json()
+inflation_response = inflation_response.json()
+
+unemployment_results = unemployment_response["Results"]
+inflation_results = inflation_response["Results"]
+
+inflation = pd.DataFrame(inflation_results, columns=['year','periodName', 'value'])
+unemployment = pd.DataFrame(unemployment_results, columns=['year','periodName', 'value'])
+
+print(unemployment_response)
+#print("#######################################################")
+print(inflation_response)
+
+ax = unemployment.plot(x='periodName', y='value')
+inflation.plot(ax=ax)
+plt.title('Unemployment')
+plt.show()
